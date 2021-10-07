@@ -4,37 +4,45 @@ import { fetchCountries } from './fetchCountries.js';
 import Notiflix from 'notiflix';
 const DEBOUNCE_DELAY = 300;
 
-let id = null;
-/* const f =  debounce(() => {
-  id = setInterval(() => {
-    console.log('a');
-  }, 500);
-}, 2000);
-console.log('start');
- f(); */
-
-//restcountries.com/v2/{service}?fields={field},{field},{field}
-//restcountries.com/v2/all?fields=name,capital,currencies
-const showResult  = function (result) {
+const showResult = function (result) {
   if (result.length == 1) {
-    
-  } else {
-    let resultList = '';
-    console.log(result);
-    result.map(({ flag, name }) => {
-      console.log(flag, name);
-      resultList+=`
-      <li>
-      <img src  = "${flag}" alt = "${name}" width ="50px">
-      </li>
-      `; 
- 
+    const { flag, name, capital, population, languages } = result[0];
+    let langString = '';
+    const langList = languages.map(({ name }) => {
+      langString += name + ', ';
     });
-    document.querySelector('.country-list').innerHTML = resultList;
+    langString = langString.slice(0, langString.length - 2);
+    let resultString = `
+      <img src  = "${flag}" alt = "${name}" width ="50px"><span class="country-title">${name}</span>
+      <ul class= "country-info__params">
+        <li>
+          <span class="country-info__param-title">Capital:</span>
+          <span class="country-info__param-value">${capital}</span>
+        </li>
+        <li>
+          <span class="country-info__param-title">Population:</span>
+          <span class="country-info__param-value">${population}</span>
+        </li>
+        <li>
+          <span class="country-info__param-title">Languages:</span>
+          <span class="country-info__param-value">${langString}</span>
+        </li>
+      </ul>
+      `;
+    document.querySelector('.country-info').innerHTML = resultString;
+  } else {
+    let resultString = '';
+    result.map(({ flag, name }) => {
+      resultString += `
+      <li class = "country-parameter">
+      <img src  = "${flag}" alt = "${name}" width ="50px">
+      <spam class = "country-name">${name}</span>
+      </li>
+      `;
+    });
+    document.querySelector('.country-list').innerHTML = resultString;
   }
-}
-
-//0: {languages: Array(2), flag: 'https://flagcdn.com/as.svg', name: 'American Samoa', capital: 'Pago Pago', population: 55197}
+};
 
 const filter = name =>
   fetchCountries(`/name/${name}?fields=name,capital,population,flag,languages`)
@@ -48,10 +56,19 @@ const filter = name =>
       Notiflix.Notify.failure(err);
     });
 
+const clearMarkupByClass = function (className) {
+  document.querySelector(`.${className}`).innerHTML = '';
+};
+
 const typeElement = document.querySelector('#search-box');
 typeElement.addEventListener(
   'input',
   debounce(() => {
-    if (!typeElement.value == '') filter(typeElement.value.trim());
-  }, 300),
+    clearMarkupByClass('country-list');
+    clearMarkupByClass('country-info');
+    if (!typeElement.value == '') {
+      document.querySelector('#search-box');
+      filter(typeElement.value.trim());
+    }
+  }, DEBOUNCE_DELAY),
 );
