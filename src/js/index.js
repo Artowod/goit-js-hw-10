@@ -60,15 +60,15 @@ const clearMarkupByClass = function (className) {
   document.querySelector(`.${className}`).innerHTML = '';
 };
 
-const typeElement = document.querySelector('#search-box');
-typeElement.addEventListener(
+const searchBox = document.querySelector('#search-box');
+searchBox.addEventListener(
   'input',
   debounce(() => {
     clearMarkupByClass('country-list');
     clearMarkupByClass('country-info');
-    if (!typeElement.value == '') {
+    if (!searchBox.value == '') {
       document.querySelector('#search-box');
-      filter(typeElement.value.trim());
+      filter(searchBox.value.trim());
     }
   }, DEBOUNCE_DELAY),
 );
