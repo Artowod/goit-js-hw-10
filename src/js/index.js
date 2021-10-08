@@ -12,7 +12,8 @@ import {
 const filter = name =>
   fetchCountries(`/name/${name}?fields=name,capital,population,flag,languages`)
     .then(result => {
-      if (result.status) throw 'Oops, there is no country with that name';
+      console.log(result);
+      if (result.status === '404') throw 'Oops, there is no country with that name';
       if (result.length > 10)
         Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
       else showResult(result);
@@ -27,8 +28,7 @@ searchBox.addEventListener(
   debounce(() => {
     clearMarkupByClass('country-list');
     clearMarkupByClass('country-info');
-    if (!searchBox.value == '') {
-      document.querySelector('#search-box');
+    if (!searchBox.value.trim() == '') {
       filter(searchBox.value.trim());
     }
   }, DEBOUNCE_DELAY),
